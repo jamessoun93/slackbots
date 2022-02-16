@@ -189,7 +189,7 @@ app.action('join-vertext', async ({ body, ack, say, client, logger }) => {
           },
           {
             "type": "input",
-            "block_id": "addition",
+            "block_id": "option",
             "optional": true,
             "element": {
               "type": "static_select",
@@ -314,13 +314,18 @@ app.view('order_view', async ({ ack, body, view, client, logger }) => {
   await ack();
 
   const user = body.user.id;
-  // const result = view.private_metadata;
-  console.log(user)
-  console.log(view.state.values)
+  const menu = view.state.values.menu["static_select-action"].selected_option.value
+  const size = view.state.values.size["static_select-action"].selected_option.value
+  const sauce = view.state.values.sauce["static_select-action"].selected_option.value
+  const option = view.state.values.option["static_select-action"].selected_option?.value
+  const drink = view.state.values.drink["static_select-action"].selected_option?.value
+
+  console.log(menu, size, sauce, option, drink)
 
   try {
-    await client.chat.postMessage({
+    await client.chat.postEphemeral({
       channel: "C015R6X4JCV",
+      user: user,
       text: `<@${user}>님은 result를 선택하셨습니다!`
     });
   }
