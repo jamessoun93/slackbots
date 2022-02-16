@@ -15,9 +15,8 @@ app.message('vt', async ({ message, say }) => {
       {
         "type": "section",
         "text": {
-          "type": "plain_text",
-          "text": "🔔 버텍스 주문하실분~!",
-          "emoji": true
+          "type": "mrkdwn",
+          "text": ":studio_microphone: (츼직츼직..) 아아",
         }
       },
       {
@@ -27,7 +26,7 @@ app.message('vt', async ({ message, say }) => {
             "type": "button",
             "text": {
               "type": "plain_text",
-              "text": "주문하기",
+              "text": "탑승하기",
               "emoji": true
             },
             "value": "click_me_123",
@@ -46,131 +45,261 @@ app.action('join-vertext', async ({ body, ack, say, client, logger }) => {
     const result = await client.views.open({
       trigger_id: body.trigger_id,
       view: {
-        "type": "modal",
-        "callback_id": "menu_view",
         "title": {
           "type": "plain_text",
-          "text": "버텍스 주문 Bot",
-          "emoji": true
-        },
-        "blocks": [
-          {
-            "type": "section",
-            "text": {
-              "type": "plain_text",
-              "text": "주문하실 메뉴를 골라주세요!",
-              "emoji": true
-            }
-          },
-          {
-            "type": "actions",
-            "block_id": "menu_choices",
-            "elements": [
-              {
-                "action_id": "choose-menu",
-                "type": "radio_buttons",
-                "options": [
-                  {
-                    "text": {
-                      "type": "plain_text",
-                      "text": "미국식 닭고기 덮밥",
-                      "emoji": true
-                    },
-                    "value": "미국식 닭고기 덮밥"
-                  },
-                  {
-                    "text": {
-                      "type": "plain_text",
-                      "text": "미국식 새우 닭고기 덮밥",
-                      "emoji": true
-                    },
-                    "value": "미국식 새우 닭고기 덮밥"
-                  }
-                ],
-              }
-            ]
-          }
-        ]
-      }
-    });
-  }
-  catch (error) {
-    logger.error(error);
-  }
-});
-
-app.action('choose-menu', async ({ body, ack, say, client, logger }) => {
-  await ack();
-  
-  const menu = body.actions[0].selected_option.value
-
-  try {
-    const result = await client.views.update({
-      view_id: body.view.id,
-      hash: body.view.hash,
-      view: {
-        "title": {
-          "type": "plain_text",
-          "text": "버텍스 주문 Bot",
+          "text": "탑승권 예약",
           "emoji": true
         },
         "submit": {
           "type": "plain_text",
-          "text": "Submit"
+          "text": "확인",
+          "emoji": true
         },
         "type": "modal",
-        "callback_id": "size_view",
-        "private_metadata": menu,
+        "close": {
+          "type": "plain_text",
+          "text": "취소",
+          "emoji": true
+        },
+        "callback_id": "order_view",
         "blocks": [
           {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": `:white_check_mark: 선택하신 메뉴는 *${menu}* 입니다!`
+            "type": "input",
+            "block_id": "menu",
+            "element": {
+              "type": "static_select",
+              "placeholder": {
+                "type": "plain_text",
+                "text": "메뉴 선택",
+                "emoji": true
+              },
+              "options": [
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "미국식 닭고기 덮밥",
+                    "emoji": true
+                  },
+                  "value": "미국식 닭고기 덮밥"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "미국식 새우 닭고기 덮밥",
+                    "emoji": true
+                  },
+                  "value": "미국식 새우 닭고기 덮밥"
+                }
+              ],
+              "action_id": "static_select-action"
+            },
+            "label": {
+              "type": "plain_text",
+              "text": "메뉴 선택 (필수)",
+              "emoji": true
             }
           },
           {
-            "type": "section",
-            "text": {
-              "type": "mrkdwn",
-              "text": "이제 *사이즈* 를 선택해주세요!"
+            "type": "input",
+            "block_id": "size",
+            "element": {
+              "type": "static_select",
+              "placeholder": {
+                "type": "plain_text",
+                "text": "사이즈 선택",
+                "emoji": true
+              },
+              "options": [
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "S (점심 한끼 괜찮은 정도)",
+                    "emoji": true
+                  },
+                  "value": "S"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "M (점심 한끼 배부른 정도)",
+                    "emoji": true
+                  },
+                  "value": "M"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "L (점심, 저녁 나눠먹기 좋은 정도)",
+                    "emoji": true
+                  },
+                  "value": "L"
+                }
+              ],
+              "action_id": "static_select-action"
+            },
+            "label": {
+              "type": "plain_text",
+              "text": "사이즈 선택 (필수)",
+              "emoji": true
             }
           },
           {
-            "type": "actions",
-            "block_id": "size_radio",
-            "elements": [
-              {
-                "type": "radio_buttons",
-                "options": [
-                  {
-                    "text": {
-                      "type": "plain_text",
-                      "text": "S",
-                      "emoji": true
-                    },
-                    "value": "S"
+            "type": "input",
+            "block_id": "sauce",
+            "element": {
+              "type": "static_select",
+              "placeholder": {
+                "type": "plain_text",
+                "text": "소스 선택",
+                "emoji": true
+              },
+              "options": [
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "데리야끼",
+                    "emoji": true
                   },
-                  {
-                    "text": {
-                      "type": "plain_text",
-                      "text": "M",
-                      "emoji": true
-                    },
-                    "value": "M"
+                  "value": "데리야끼"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "페퍼",
+                    "emoji": true
                   },
-                  {
-                    "text": {
-                      "type": "plain_text",
-                      "text": "L",
-                      "emoji": true
-                    },
-                    "value": "L"
-                  }
-                ],
-                "action_id": "choose-size"
-              }
-            ]
+                  "value": "페퍼"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "염염",
+                    "emoji": true
+                  },
+                  "value": "염염"
+                }
+              ],
+              "action_id": "static_select-action"
+            },
+            "label": {
+              "type": "plain_text",
+              "text": "소스 선택 (필수)",
+              "emoji": true
+            }
+          },
+          {
+            "type": "input",
+            "block_id": "addition",
+            "optional": true,
+            "element": {
+              "type": "static_select",
+              "placeholder": {
+                "type": "plain_text",
+                "text": "추가 선택",
+                "emoji": true
+              },
+              "options": [
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "밥 100g",
+                    "emoji": true
+                  },
+                  "value": "밥 100g"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "염염 소스",
+                    "emoji": true
+                  },
+                  "value": "염염 소스"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "데리야끼 소스",
+                    "emoji": true
+                  },
+                  "value": "데리야끼 소스"
+                }
+              ],
+              "action_id": "static_select-action"
+            },
+            "label": {
+              "type": "plain_text",
+              "text": "추가 선택 (Optional)",
+              "emoji": true
+            }
+          },
+          {
+            "type": "input",
+            "block_id": "drink",
+            "optional": true,
+            "element": {
+              "type": "static_select",
+              "placeholder": {
+                "type": "plain_text",
+                "text": "음료 선택",
+                "emoji": true
+              },
+              "options": [
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "코카콜라",
+                    "emoji": true
+                  },
+                  "value": "코카콜라"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "제로콜라",
+                    "emoji": true
+                  },
+                  "value": "제로콜라"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "스프라이트",
+                    "emoji": true
+                  },
+                  "value": "스프라이트"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "닥터페퍼",
+                    "emoji": true
+                  },
+                  "value": "닥터페퍼"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "웰치스(포도)",
+                    "emoji": true
+                  },
+                  "value": "웰치스(포도)"
+                },
+                {
+                  "text": {
+                    "type": "plain_text",
+                    "text": "마운틴듀",
+                    "emoji": true
+                  },
+                  "value": "마운틴듀"
+                }
+              ],
+              "action_id": "static_select-action"
+            },
+            "label": {
+              "type": "plain_text",
+              "text": "음료 선택 (Optional)",
+              "emoji": true
+            }
           }
         ]
       }
@@ -181,26 +310,21 @@ app.action('choose-menu', async ({ body, ack, say, client, logger }) => {
   }
 });
 
-app.action('choose-size', async ({ body, ack, say, client, logger }) => {
-  await ack();
-  // console.log(body.actions[0].selected_option.value)
-  // console.log(body.view.private_metadata)
-});
-
-app.view('size_view', async ({ ack, body, view, client, logger }) => {
+app.view('order_view', async ({ ack, body, view, client, logger }) => {
   await ack();
 
   const user = body.user.id;
-  const selectedMenu = view.private_metadata;
-  const selectedSize = view.state.values.size_radio['choose-size'].selected_option.value;
+  // const result = view.private_metadata;
+  console.log(user)
+  console.log(view.state.values)
 
   try {
     await client.chat.postMessage({
-      channel: user,
-      text: `<@${body.user.id}>님은 ${selectedMenu} 사이즈 ${selectedSize}를 선택하셨습니다!`
+      channel: "C015R6X4JCV",
+      text: `<@${user}>님은 result를 선택하셨습니다!`
     });
   }
-  catch(error) {
+  catch (error) {
     logger.error(error);
   }
 });
