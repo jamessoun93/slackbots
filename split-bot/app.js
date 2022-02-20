@@ -112,7 +112,6 @@ app.command('/정산', async ({ ack, body, client, logger }) => {
   }
 });
 
-
 app.view('split_view', async ({ ack, body, view, client, logger }) => {
   await ack();
 
@@ -176,25 +175,6 @@ app.view('split_view', async ({ ack, body, view, client, logger }) => {
   catch (error) {
     logger.error(error);
   }
-
-  // const menu = view.state.values.menu["static_select-action"].selected_option.value
-  // const size = view.state.values.size["static_select-action"].selected_option.value
-  // const sauce = view.state.values.sauce["static_select-action"].selected_option.value
-  // const option = view.state.values.option["static_select-action"].selected_option?.value
-  // const drink = view.state.values.drink["static_select-action"].selected_option?.value
-
-  // console.log(menu, size, sauce, option, drink)
-
-  // try {
-  //   await client.chat.postEphemeral({
-  //     channel: "C015R6X4JCV",
-  //     user: user,
-  //     text: `<@${user}>님은 result를 선택하셨습니다!`
-  //   });
-  // }
-  // catch (error) {
-  //   logger.error(error);
-  // }
 });
 
 (async () => {
