@@ -322,11 +322,25 @@ app.view('order_view', async ({ ack, body, view, client, logger }) => {
 
   console.log(menu, size, sauce, option, drink)
 
+  const order = () => {
+    let str = `✅ *${menu} ${size} ${sauce}*`;
+
+    if (option || drink) {
+      str += ` + 추가옵션(${option}, ${drink})`;
+    }
+
+    return str;
+  }
+
+  const month = new Date().getMonth() + 1;
+  const date = new Date().getDate();
+  const today = `${month}월 ${date}일`
+
   try {
     await client.chat.postEphemeral({
       channel: "C015R6X4JCV",
       user: user,
-      text: `<@${user}>님은 result를 선택하셨습니다!`
+      text: `<@${user}>님! ${today} 탑승권 예약 완료되셨습니다.\n\n${order()}`
     });
   }
   catch (error) {

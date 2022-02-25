@@ -112,15 +112,108 @@ app.command('/정산', async ({ ack, body, client, logger }) => {
   }
 });
 
+// app.view('split_view', async({ ack, body, view, client, logger }) => {
+//   await ack();
+
+//   try {
+//     const result = await client.views.update({
+//       view_id: body.view.id,
+//       hash: body.view.hash,
+//       view: {
+//         "type": "modal",
+//         "callback_id": "split_view",
+//         "title": {
+//           "type": "plain_text",
+//           "text": "정산도우미",
+//           "emoji": true
+//         },
+//         "submit": {
+//           "type": "plain_text",
+//           "text": "Submit",
+//           "emoji": true
+//         },
+//         "close": {
+//           "type": "plain_text",
+//           "text": "Cancel",
+//           "emoji": true
+//         },
+//         "blocks": [
+//           {
+//             "type": "header",
+//             "text": {
+//               "type": "plain_text",
+//               "text": `{항목}에 대한 정산요청을 확인해주세요.`,
+//               "emoji": true
+//             }
+//           },
+//           {
+//             "type": "context",
+//             "elements": [
+//               {
+//                 "type": "image",
+//                 "image_url": "https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg",
+//                 "alt_text": "cute cat"
+//               },
+//               {
+//                 "type": "mrkdwn",
+//                 "text": "*Cat* has approved this message."
+//               }
+//             ]
+//           },
+//           {
+//             "type": "context",
+//             "elements": [
+//               {
+//                 "type": "image",
+//                 "image_url": "https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg",
+//                 "alt_text": "cute cat"
+//               },
+//               {
+//                 "type": "mrkdwn",
+//                 "text": "*Cat* has approved this message."
+//               }
+//             ]
+//           },
+//           {
+//             "type": "context",
+//             "elements": [
+//               {
+//                 "type": "image",
+//                 "image_url": "https://pbs.twimg.com/profile_images/625633822235693056/lNGUneLX_400x400.jpg",
+//                 "alt_text": "cute cat"
+//               },
+//               {
+//                 "type": "mrkdwn",
+//                 "text": "*Cat* has approved this message."
+//               }
+//             ]
+//           },
+//           {
+//             "type": "section",
+//             "text": {
+//               "type": "mrkdwn",
+//               "text": "각 *10,000원* 이 맞나요?"
+//             }
+//           }
+//         ]
+//       }
+//     })
+//   }
+//   catch (error) {
+//     logger.error(error);
+//   }
+// })
 
 app.view('split_view', async ({ ack, body, view, client, logger }) => {
   await ack();
 
   const user = body.user.id;
+  const description = view.state.values.description["plain_text_input-action"].value
   const total = view.state.values.total["plain_text_input-action"].value
+  const accountInfo = view.state.values.account_info["plain_text_input-action"].value
   const subjects = view.state.values.subjects["multi_users_select-action"].selected_users
   
-  const amountDue = total / (subjects.length + 1)
+  const amountDue = Math.round(total / (subjects.length + 1), 0)
   console.log(total, amountDue)
 
   try {
@@ -135,7 +228,7 @@ app.view('split_view', async ({ ack, body, view, client, logger }) => {
                 "type": "header",
                 "text": {
                   "type": "plain_text",
-                  "text": "🤑 새로운 정산 요청",
+                  "text": `🤑 새로운 정산 요청`,
                   "emoji": true
                 }
               },
@@ -143,7 +236,7 @@ app.view('split_view', async ({ ack, body, view, client, logger }) => {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "*항목*: 점심 버텍스"
+                  "text": `*항목*: ${description}`
                 }
               },
               {
@@ -157,7 +250,7 @@ app.view('split_view', async ({ ack, body, view, client, logger }) => {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "*계좌*: 카뱅 3333-06-12345"
+                  "text": `*계좌정보*: ${accountInfo}`
                 }
               },
               {
@@ -171,30 +264,17 @@ app.view('split_view', async ({ ack, body, view, client, logger }) => {
           }
         ]
       })
-    }))
+    })).then(_ => {
+      client.chat.postEphemeral({
+        channel: "C015R6X4JCV",
+        user: user,
+        text: `<@${user}>님!\n*${description}*에 대한 정산요청을 완료했습니다!`
+      });
+    })
   }
   catch (error) {
     logger.error(error);
   }
-
-  // const menu = view.state.values.menu["static_select-action"].selected_option.value
-  // const size = view.state.values.size["static_select-action"].selected_option.value
-  // const sauce = view.state.values.sauce["static_select-action"].selected_option.value
-  // const option = view.state.values.option["static_select-action"].selected_option?.value
-  // const drink = view.state.values.drink["static_select-action"].selected_option?.value
-
-  // console.log(menu, size, sauce, option, drink)
-
-  // try {
-  //   await client.chat.postEphemeral({
-  //     channel: "C015R6X4JCV",
-  //     user: user,
-  //     text: `<@${user}>님은 result를 선택하셨습니다!`
-  //   });
-  // }
-  // catch (error) {
-  //   logger.error(error);
-  // }
 });
 
 (async () => {
