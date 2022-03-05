@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 const { App } = require('@slack/bolt');
 
 const app = new App({
@@ -6,10 +6,11 @@ const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
   socketMode: true,
   appToken: process.env.SLACK_APP_TOKEN,
-  port: process.env.PORT || 3000
+  port: process.env.PORT || 3000,
 });
 
 // 경영지원 side trigger -> /점심
+// command로 할지 그냥 입력으로 할지 정해야함
 
 app.command('/점심', async ({ ack, body, client, logger }) => {
   await ack();
@@ -17,46 +18,45 @@ app.command('/점심', async ({ ack, body, client, logger }) => {
   try {
     const result = await client.views.open({
       trigger_id: body.trigger_id,
-      "callback_id": "submit_view",
+      callback_id: 'submit_view',
       view: {
-        "type": "modal",
-        "title": {
-          "type": "plain_text",
-          "text": "점심 주문",
-          "emoji": true
+        type: 'modal',
+        title: {
+          type: 'plain_text',
+          text: '점심 주문',
+          emoji: true,
         },
-        "submit": {
-          "type": "plain_text",
-          "text": "확인",
-          "emoji": true
+        submit: {
+          type: 'plain_text',
+          text: '확인',
+          emoji: true,
         },
-        "close": {
-          "type": "plain_text",
-          "text": "취소",
-          "emoji": true
+        close: {
+          type: 'plain_text',
+          text: '취소',
+          emoji: true,
         },
-        "blocks": [
+        blocks: [
           {
-            "type": "input",
-            "element": {
-              "type": "plain_text_input",
-              "action_id": "lunch_menu"
+            type: 'input',
+            element: {
+              type: 'plain_text_input',
+              action_id: 'lunch_menu',
             },
-            "label": {
-              "type": "plain_text",
-              "text": "오늘의 점심 메뉴는 무엇인가요?",
-              "emoji": true
-            }
-          }
-        ]
-      }
-    })
-  }
-  catch (error) {
+            label: {
+              type: 'plain_text',
+              text: '오늘의 점심 메뉴는 무엇인가요?',
+              emoji: true,
+            },
+          },
+        ],
+      },
+    });
+  } catch (error) {
     logger.error(error);
   }
 });
- 
+
 app.view('submit_view', async ({ ack, body, view, client, logger }) => {
   await ack();
 
@@ -65,9 +65,9 @@ app.view('submit_view', async ({ ack, body, view, client, logger }) => {
   // const total = view.state.values.total["plain_text_input-action"].value
   // const accountInfo = view.state.values.account_info["plain_text_input-action"].value
   // const subjects = view.state.values.subjects["multi_users_select-action"].selected_users
-  
-  const amountDue = Math.round(total / (subjects.length + 1), 0)
-  console.log(total, amountDue)
+
+  const amountDue = Math.round(total / (subjects.length + 1), 0);
+  console.log(total, amountDue);
 
   // try {
   //   Promise.all(subjects.map(sub => {
